@@ -3,22 +3,14 @@ import praw
 import os
 import re
 import datetime
-import time
+from datetime import datetime
 from discord.ext import tasks
 from replit import db
 from keep_alive import keep_alive
 
 posts_to_fetch = 8
-frecuency = 12 #hours
-
-def init_schedule(year, month, day, hour, minute):  #Delay exec. till set date & time
-  print(datetime.datetime.now())
-  target_time = datetime.datetime(year, month, day, hour, minute)  #server is +4h
-
-  while datetime.datetime.now() < target_time:
-    time.sleep(300) #300secs - 5min
-  print('Time reached.')
-  return
+target_time_1 = "11:00" #Server is +4h 11:00, 23:00
+target_time_2 = "23:00"
 
 #------------
 #   Reddit
@@ -70,6 +62,7 @@ def get_hot_posts(): #fetch top n posts from hot section of given subreddit
 #-------------
 
 prefix = '$'
+frecuency = 12 #hours
 client = discord.Client()
 
 #### Embed functions ####
@@ -165,23 +158,23 @@ async def on_guild_join(guild):
       await channel.send('Hello, my name is Scavenger! Use $help to see some info about me. Use $start to begin searching.')
     break
 
-@tasks.loop(hours=frecuency) #automatic loop (set time interval)
+@tasks.loop(minutes=1) #automatic loop (checks every minute)
 async def search_loop():
-  print('Num of guilds: ' + str(len(client.guilds))) #Check num of guilds bot is in
+  current_time = datetime.now().strftime("%H:%M") #hour %H min %M sec %S am:pm %p 
+  print(current_time)
 
-  target = db['channels'] #fetch list of guilds to post in
+  if current_time == target_time_1 or current_time == target_time_2: #is it time to post?
+    print('Num of guilds: ' + str(len(client.guilds))) #Check num of guilds bot is in
 
-  #fetch the game deals and store them in db
-  title_list, url_list = get_hot_posts()
-  db['titles'] = title_list
-  db['urls'] = url_list
+    target = db['channels'] #fetch list of guilds to post in
 
-  for i in range(len(target)):  #Broadcast the self-cmd
-    await client.get_channel(target[i]).send('Scavenging')
+    #fetch the game deals and store them in db
+    title_list, url_list = get_hot_posts()
+    db['titles'] = title_list
+    db['urls'] = url_list
 
-  #Delete the game deals from db
-  del db['titles']
-  del db['urls']
+    for i in range(len(target)):  #Broadcast the self-cmd
+      await client.get_channel(target[i]).send('Scavenging')
 
 #### Commands ####
 
@@ -239,6 +232,5 @@ async def on_message(message):
     await message.channel.send('I will no longer post here!')
     return
 
-keep_alive()  #Start web server
-init_schedule(year=2021, month=7, day=17, hour=23, minute=45) #delay until set time
+keep_alive()                    #Start web server
 client.run(os.environ['TOKEN']) #Execute disc bot
