@@ -9,8 +9,8 @@ from replit import db
 from keep_alive import keep_alive
 
 posts_to_fetch = 8
-target_time_1 = "11:00" #Server is +4h 11:00, 23:00
-target_time_2 = "23:00"
+target_time_1 = "11:00" #11:00
+target_time_2 = "23:00" #23:00
 
 #------------
 #   Reddit
@@ -174,7 +174,10 @@ async def search_loop():
     db['urls'] = url_list
 
     for i in range(len(target)):  #Broadcast the self-cmd
-      await client.get_channel(target[i]).send('Scavenging')
+      try:
+        await client.get_channel(target[i]).send('Scavenging')
+      except AttributeError: #If bot was kicked or server deleted
+        pass
 
 #### Commands ####
 
