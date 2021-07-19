@@ -107,7 +107,7 @@ def build_help_embed(): #Assemble the embed with the bot info
   )
   embed.add_field(
     name='Free games',
-    value='Whenever I find a free game, I will an embed with a RED stripe',
+    value='Whenever I find a free game, I will make an embed with a RED stripe',
     inline=False
   )
   embed.set_footer(text='Bot made by Outfasted')
@@ -203,9 +203,10 @@ async def on_message(message):
   if message.author == client.user or message.author.bot: #Ignore if own msg or if bot
     return
 
-  if not message.author.guild_permissions.administrator: #Ignore if not admin
-    await message.channel.send('Admin powers are required')
-    return
+  if message.content.startswith(prefix):
+    if not message.author.guild_permissions.administrator: #Ignore if not admin
+      await message.channel.send('Admin powers are required')
+      return
 
   if message.content.startswith(prefix + 'search'): #Manual search
     title_list, url_list = get_hot_posts() #fetch posts from reddit
