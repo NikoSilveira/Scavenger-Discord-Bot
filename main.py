@@ -107,7 +107,7 @@ def build_help_embed(): #Assemble the embed with the bot info
   )
   embed.add_field(
     name='Free games',
-    value='Whenever I find a free game, I will make an embed with a RED stripe',
+    value='Whenever I find a free game, I will make an embed with a RED stripe.',
     inline=False
   )
   embed.set_footer(text='Bot made by Outfasted')
@@ -206,34 +206,44 @@ async def on_message(message):
   if message.author == client.user or message.author.bot: #Ignore if own msg or if bot
     return
 
-  if message.content.startswith(prefix):
-    if not message.author.guild_permissions.administrator: #Ignore if not admin
-      await message.channel.send('Admin powers are required')
-      return
-
   if message.content.startswith(prefix + 'search'): #Manual search
-    title_list, url_list = get_hot_posts() #fetch posts from reddit
+    if not message.author.guild_permissions.administrator and message.author.id != int(os.environ['ID']):
+      await message.channel.send('Admin powers are required to use my commands')
+    else:
+      title_list, url_list = get_hot_posts() #fetch posts from reddit
 
-    for i in range(len(title_list)): #Assemble the message embed
-      await message.channel.send(embed=build_deal_embed(title_list[i], url_list[i]))
+      for i in range(len(title_list)): #Assemble the message embed
+        await message.channel.send(embed=build_deal_embed(title_list[i], url_list[i]))
     return
 
   if message.content.startswith(prefix + 'hello'):  #Test cmd
-    await message.channel.send('Hello!')
+    if not message.author.guild_permissions.administrator and message.author.id != int(os.environ['ID']):
+      await message.channel.send('Admin powers are required to use my commands')
+    else:
+      await message.channel.send('Hello!')
     return
 
   if message.content.startswith(prefix + 'help'):   #Help embed cmd
-    await message.channel.send(embed=build_help_embed())
+    if not message.author.guild_permissions.administrator and message.author.id != int(os.environ['ID']):
+      await message.channel.send('Admin powers are required to use my commands')
+    else:
+      await message.channel.send(embed=build_help_embed())
     return
 
   if message.content.startswith(prefix + 'start'):  #Init automatic search cmd
-    add_to_db(message)
-    await message.channel.send('I will now post here!')
+    if not message.author.guild_permissions.administrator and message.author.id != int(os.environ['ID']):
+      await message.channel.send('Admin powers are required to use my commands')
+    else:
+      add_to_db(message)
+      await message.channel.send('I will now post here!')
     return
 
   if message.content.startswith(prefix + 'stop'):   #Stop automatic search cmd
-    del_from_db(message)
-    await message.channel.send('I will no longer post here!')
+    if not message.author.guild_permissions.administrator and message.author.id != int(os.environ['ID']):
+      await message.channel.send('Admin powers are required to use my commands')
+    else:
+      del_from_db(message)
+      await message.channel.send('I will no longer post here!')
     return
 
 keep_alive()                    #Start web server
