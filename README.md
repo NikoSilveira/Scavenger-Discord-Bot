@@ -3,7 +3,7 @@ Discord bot that integrates a web scrapping system to periodically scan the web 
 
 Utilizes PRAW (Reddit API) to search for the required data.
 
-The bot is developed using the Discord.py module.
+The bot was developed using the Discord.py module.
 
 Developed and hosted in Replit.
 
