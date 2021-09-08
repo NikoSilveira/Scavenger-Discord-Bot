@@ -29,9 +29,12 @@ def sort_posts(target_title_list, target_url_list): #Put free deals at the end
   nonfree_url_list = []
   
   for i in range(len(target_title_list)):
-    x = re.findall('100%', target_title_list[i]) #Regex to find all 100% deals
+    #Regex to find all 100% deals
+    x1 = re.findall('100%', target_title_list[i]) 
+    x2 = re.findall('Free', target_title_list[i])
+    x3 = re.findall('FREE', target_title_list[i])
     
-    if x: #If: 100%, else: not 100%
+    if x1 or x2 or x3: #If: 100%, else: not 100%
       free_title_list.append(target_title_list[i])
       free_url_list.append(target_url_list[i])
     else:
@@ -68,9 +71,16 @@ client = discord.Client()
 #### Embed functions ####
 
 def build_deal_embed(title, url, color=discord.Color.blue()):
-  x = re.findall('100%', title) #Use regex to check for 100% discount
-  if x:
-    color = discord.Color.red()
+
+  #Use regex to check for 100% discount
+  x1 = re.findall('100%', title) 
+  x2 = re.findall('Free', title)
+  x3 = re.findall('FREE', title)
+  
+  if x1:
+    color = discord.Color.red() #If '100%' string found
+  elif x2 or x3:
+    color = discord.Color.orange() #If 'free' or 'FREE' string found
 
   embed = discord.Embed(
     title='Game Deal',
@@ -107,7 +117,7 @@ def build_help_embed(): #Assemble the embed with the bot info
   )
   embed.add_field(
     name='Free games',
-    value='Whenever I find a free game, I will make an embed with a RED stripe.',
+    value='Whenever I find a free game, I will make an embed with a RED stripe. If I am not so certain about whether the deal is free or not, it will be an ORANGE stripe',
     inline=False
   )
   embed.set_footer(text='Bot made by Outfasted')
